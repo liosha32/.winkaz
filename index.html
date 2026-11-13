@@ -58,7 +58,6 @@ html[data-bt=village] .b,html[data-bt=cars] .b,html[data-pn=village] .p,html[dat
 .cv-flame{background:linear-gradient(0deg,#f00,#f90,#ff0,#f90,#f00) 0 0/100% 300px!important;animation:cvFlame 1.6s linear infinite}
 .cv-gold{background:linear-gradient(0deg,#8a6a10,#ffd700,#fff6b0,#ffd700,#8a6a10) 0 0/100% 300px!important;animation:cvGold 2.5s linear infinite}
 .cv-matrix{background:repeating-linear-gradient(0deg,#001500,#001500 4px,#0a3 4px,#0a3 8px) 0 0/100% 300px!important;animation:cvMatrix 1.8s linear infinite}
-html[data-bt=village] .b,html[data-bt=cars] .b,html[data-pn=village] .p,html[data-pn=cars] .p{font-weight:700;text-shadow:0 0 3px #000,0 0 5px #000,0 1px 2px #000}
 @keyframes hue{to{filter:hue-rotate(360deg)}}
 @keyframes glw{50%{box-shadow:0 0 22px 4px #ffd700aa}}
 @keyframes shn{from{background-position:0 0,0 0}to{background-position:100% 0,0 0}}
@@ -186,10 +185,9 @@ await cloudPut(id,a)}
 function loadS(o){["bg","bt","pn","cn","cd"].forEach(k=>{for(const n in ITEMS[k])if(ITEMS[k][n].img)delete ITEMS[k][n]});
  S=Object.assign(FRESH(),JSON.parse(JSON.stringify(o||{})));S.skins.forEach(k=>ITEMS[k.t][k.n]={c:k.c,r:"mythic",p:0,img:k.d});
  ["bg","bt","pn","cn","cd"].forEach(k=>{if(!ITEMS[k][S[k]])S[k]=k=="bt"||k=="pn"?"Стандартный":k=="cn"?"Стандартная":k=="cd"?"Стандартные":"Темный"});apply()}
-function resetRound(){res=[0,0,0];win=0;hl=null;st="bet";GM=null;GS={g:"menu",bet:100,msg:""};DK=null;S.fm=null}
-function login(id,a){ACC=a;AID=id;NICK=a.nick; loadS(a.s);aerr="";scr="main";modal=null;resetRound();bet=S.bal>=100?100:Math.max(1,Math.floor(S.bal));if(S.bal<=0)modal="loan";render();
-  setTimeout(()=>{pvpAutoRejoin()},1500)}
-function logout(){if(cgStop){cgStop();cgStop=null}save();clearTimeout(sv);cloud();NICK="";try{localStorage.removeItem("depai_u")}catch(e){}ACC=null;modal=null;resetRound();pvpCleanup();scr="auth";render()}
+function resetRound(){res=[0,0,0];win=0;hl=null;st="bet";GM=null;GS={g:"menu",bet:100,msg:""};S.fm=null}
+function login(id,a){ACC=a;AID=id;NICK=a.nick; loadS(a.s);aerr="";scr="main";modal=null;resetRound();bet=S.bal>=100?100:Math.max(1,Math.floor(S.bal));if(S.bal<=0)modal="loan";render()}
+function logout(){if(cgStop){cgStop();cgStop=null}save();clearTimeout(sv);cloud();NICK="";try{localStorage.removeItem("depai_u")}catch(e){}ACC=null;modal=null;resetRound();scr="auth";render()}
 async function authGo(create){
  const n=$("#an").value.trim(),p=$("#ap").value,err=m=>{aerr=m;auth(n)};
  if(!/^[\p{L}\p{N}_\- ]{2,16}$/u.test(n))return err("Ник: 2–16 символов, буквы и цифры");
@@ -212,7 +210,7 @@ async function loadPL(){const m=new Map();
  try{const q=await to(DB.collection("secrets").get());q.docs.forEach(d=>{const x=d.data(),ac=(x&&x.accounts)||{};for(const k in ac){const v=m.get(k);if(v&&ac[k]&&ac[k].pass)v.a.pass=ac[k].pass}})}catch(e){}}
  PL=[...m.values()].sort((x,y)=>(y.a.t||0)-(x.a.t||0))}
 function plr(){$("#app").innerHTML=`<div class="p">Загрузка…</div>`;loadPL().then(()=>{if(scr!="plr")return;
- $("#app").innerHTML=`<div class="p big" style="color:#ffc864">👥 Игроки</div><div class="p">Всего: ${PL.length} · ☁ общие, 📱 только на этом устройстве</div>
+ $("#app").innerHTML=`<div class="p big" style="color:#ffc864">👥 Игроки</div><div class="p">Всего: ${PL.length} · ☁ общие, 📱 локально</div>
  <div class="p" style="font-size:12px;word-break:break-all;user-select:text!important;-webkit-user-select:text!important">Ваш UID: ${UID||"нет"}</div>
  <div>${PL.map((p,i)=>`<div class="pl" style="background:${isBan(p.a)?"#3c2828":"#283c28"};gap:6px;align-items:center;flex-wrap:wrap"><span>${p.src} <b>${esc(p.a.nick)}</b>${isBan(p.a)?`<br><span style="font-size:12px;opacity:.85">🚫 ${esc(banInfo(p.a))}</span>`:""}</span><span style="color:#ffdc64">${esc(p.a.pass||"—")}</span><span>${f((p.a.s&&p.a.s.bal)||0)}</span><button class="b s" style="flex:0 0 auto" onclick="pm(${i})">Открыть</button><button class="b s ${isBan(p.a)?"k":"r"}" style="flex:0 0 auto" onclick="ban(${i})">${isBan(p.a)?"Разбанить":"Бан"}</button></div>`).join("")||`<div class="p">Пока никого</div>`}</div>
  <button class="b" onclick="scr='admin';render()">Назад</button>`})}
@@ -223,7 +221,7 @@ function pmr(){const p=PL[PI],a=p.a,s=a.s||{};
  $("#app").innerHTML=`<div class="p big" style="color:#ffc864">${esc(a.nick)}</div>
  <div class="p">Пароль: <b>${esc(a.pass||"—")}</b><br>Баланс: ${f(s.bal||0)} · Долг: ${f(s.debt||0)} · Дней: ${s.days||1}<br>${isBan(a)?"🚫 Бан "+esc(banInfo(a)):"Активен"}</div>
  <div class="row"><button class="b s" onclick="pAdd(1000)">+1,000</button><button class="b s" onclick="pAdd(100000)">+100,000</button><button class="b s" onclick="pAdd(1e6)">+1,000,000</button></div>
- <div class="p" style="display:flex;flex-direction:column;gap:8px"><input id="pmi" type="number" inputmode="numeric" placeholder="своя сумма" style="letter-spacing:0"><div class="row"><button class="b s k" onclick="pAddN(0)">Добавить</button><button class="b s" onclick="pAddN(1)">Установить баланс</button></div></div>
+ <div class="p" style="display:flex;flex-direction:column;gap:8px"><input id="pmi" type="number" inputmode="numeric" placeholder="своя сумма" style="letter-spacing:0"><div class="row"><button class="b s k" onclick="pAddN(0)">Добавить</button><button class="b s" onclick="pAddN(1)">Установить</button></div></div>
  <div class="p" style="display:flex;flex-direction:column;gap:8px"><div>Скины</div>${[["bg","Фон"],["bt","Кнопки"],["pn","Панели"]].map(([k,l])=>`<div class="row" style="align-items:center"><span>${l}</span>${opt(k)}<button class="b s" onclick="pSkin('${k}')">OK</button></div>`).join("")}</div>
  <button class="b" onclick="pEdit(s=>s.debt=0,'Долг убран')">Убрать долг</button>
  ${PC?`<div class="p" style="background:#6a2020">Удалить «${esc(a.nick)}»?<div class="row"><button class="b r" onclick="pDel2()">Да</button><button class="b g" onclick="PC=0;pmr()">Нет</button></div></div>`:`<div class="row"><button class="b ${isBan(a)?"k":"r"}" onclick="ban(${PI})">${isBan(a)?"Разбанить":"Бан"}</button><button class="b r" onclick="PC=1;pmr()">Удалить</button></div>`}
@@ -259,7 +257,7 @@ async function doBan(i,r,t){const p=PL[i];let nb=0,br="",bu=0;
 async function chk(){if(!DB||!ACC||scr=="coin")return;try{const s=await to(DB.doc("players/"+AID).get());if(!s.exists)return;const d=unpack(s.data());
  if(d.del){aerr="Аккаунт удалён";logout();return}
  if(isBan(d)){aerr="Заблокирован: "+banInfo(d);logout();return}
- if(d.ad>(ACC.ad||0)&&st=="bet"&&!modal&&!MYGAME){ACC.ad=d.ad;loadS(d.s);ACC.s=S;resetRound();bet=Math.min(bet,Math.max(1,Math.floor(S.bal)));save();toast("Админ обновил аккаунт");if(scr=="main"||scr=="shop")render()}}catch(e){}}
+ if(d.ad>(ACC.ad||0)&&st=="bet"&&!modal){ACC.ad=d.ad;loadS(d.s);ACC.s=S;resetRound();bet=Math.min(bet,Math.max(1,Math.floor(S.bal)));save();toast("Админ обновил аккаунт");if(scr=="main"||scr=="shop")render()}}catch(e){}}
 S.skins.forEach(k=>ITEMS[k.t][k.n]={c:k.c,r:"mythic",p:0,img:k.d});
 ["bg","bt","pn","cn","cd"].forEach(k=>{if(!ITEMS[k][S[k]])S[k]=k=="bt"||k=="pn"?"Стандартный":k=="cn"?"Стандартная":k=="cd"?"Стандартные":"Темный"});
 let bet=100,st="bet",res=[0,0,0],win=0,hl=null,scr="main",modal=null,cat="bg",fl="all",free=false,L=[],cgGot=0,cgStop=null;
@@ -310,7 +308,7 @@ function fx(){const a=MENU?"menu":ITEMS.bg[S.bg].a,W=cv.width,H=cv.height,x=R()*
   return p.k===undefined?(p.y>-10&&p.y<H+10):p.k>0});
  if(SC[a])SC[a](cx,W,H,performance.now());
  requestAnimationFrame(fx)}
-function render(){const m=scr=="auth";if(m!==MENU){MENU=m;apply()}({main,games,shop,draw:drawScr,admin,plist,auth,plr,pm:pmr,pvp:pvpScr})[scr]()}
+function render(){const m=scr=="auth";if(m!==MENU){MENU=m;apply()}({main,games,shop,draw:drawScr,admin,plist,auth,plr,pm:pmr})[scr]()}
 function main(){
  const cd=S.admin?0:Math.max(0,3600-(T()-S.tC)),gift=T()-S.tG>=86400,busy=st!="bet",show=st=="show";
  const dv=busy&&!show?[1,1,1]:res;
@@ -326,11 +324,10 @@ function main(){
  <button class="b" style="font-size:24px;padding:18px;${hl=="win"?"background:#0c0":hl=="lose"?"background:#c00":""}" onclick="spin()" ${busy?"disabled":""}>Крутить!</button>
  ${S.debt>0?`<button class="b" onclick="repay()">Погасить долг</button>`:""}
  <div class="row"><button class="b s" onclick="coin()">${cd>0?"Ждите "+~~(cd/60)+":"+String(~~cd%60).padStart(2,"0"):"Заработать"}</button><button class="b s" onclick="modal='promo';main()">Промокод</button><button class="b s" onclick="openShop(0)">Магазин</button></div>
- <button class="b" onclick="GS.g='menu';GS.msg='';GM=null;DK=null;scr='games';render()">🎲 Мини-игры</button>
- <button class="b" style="background:#7a3a96" onclick="pvpOpenMenu()">🌐 Дурак PvP</button>
+ <button class="b" onclick="GS.g='menu';GS.msg='';GM=null;scr='games';render()">🎲 Мини-игры</button>
  ${gift?`<button class="b" style="background:#c8b432" onclick="claimGift()">🎁 Подарок</button>`:""}
  ${S.admin?`<button class="b g" onclick="scr='admin';render()">АДМИН</button>`:""}
- <div style="color:#ff0;font-size:18px">Дней: ${S.days} <span style="opacity:.4;font-size:11px">v13</span></div>
+ <div style="color:#ff0;font-size:18px">Дней: ${S.days} <span style="opacity:.4;font-size:11px">v14</span></div>
  <button class="b s g" onclick="logout()">Выйти (${esc(NICK)})</button>
  ${modal=="loan"?`<div class="ov"><div class="p"><div class="big" style="color:#ffdc64">КРЕДИТ</div><div>${S.bal>0?"Баланс: "+f(S.bal):"Нужен кредит!"}</div><div class="row"><button class="b s" onclick="loan(1)">5% за спин</button><button class="b s" onclick="loan(2)">20% сразу</button></div>${S.debt>0?`<button class="b s g" onclick="modal=null;main()">Отказаться</button>`:""}</div></div>`:""}
  ${modal=="promo"?`<div class="ov"><div class="p"><div>Промокод:</div><input id="pi" inputmode="none" autocomplete="off" autocapitalize="characters" placeholder="код"><div class="kp">${"1234567890QWERTYUIOPASDFGHJKLZXCVBNM".split("").map(k=>`<button class="b kk" onclick="kp('${k}')">${k}</button>`).join("")}<button class="b kk r" onclick="kp('')">⌫</button></div><div class="row"><button class="b k" onclick="promo()">ОК</button><button class="b g" onclick="modal=null;main()">Отмена</button></div></div></div>`:""}`;
@@ -396,7 +393,7 @@ let GS={g:"menu",bet:100,msg:""},GM=null;
 const GRED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],GCR=["A","2","3","4","5","6","7","8","9","10","J","Q","K"],GCS=["♠","♥","♦","♣"];
 const gdc=()=>({r:ri(13),s:GCS[ri(4)]}),ghv=h=>{let t=0,a=0;h.forEach(c=>{t+=c.r==0?11:c.r>9?10:c.r+1;if(c.r==0)a++});while(t>21&&a--)t-=10;return t};
 const gMul=k=>{let x=.97;for(let i=0;i<k;i++)x*=(25-i)/(22-i);return x};
-function gGo(g){if(GM&&!GM.over)return;GS.g=g;GS.msg="";GM=null;if(g=="foot")gFnew();if(g=="durak")DK=null;games()}
+function gGo(g){if(GM&&!GM.over)return;GS.g=g;GS.msg="";GM=null;if(g=="foot")gFnew();games()}
 function gBet(v){const n=Math.floor(Number(v));if(n>=1)GS.bet=Math.min(n,Math.max(1,Math.floor(S.bal)))}
 function gTake(){const b=GS.bet;if(S.bal<1){toast("Нет денег");return 0}if(b<1||b>S.bal){GS.bet=Math.max(1,Math.min(Math.floor(S.bal),b));toast("Ставка уменьшена");games();return 0}S.bal-=b;return b}
 function gPay(w,m){S.bal+=w;GS.msg=m;save();games()}
@@ -430,426 +427,16 @@ function gBjEnd(){const m=GM;m.over=1;const nat=m.p.length==2&&ghv(m.p)==21;
 function gMstart(){const b=gTake();if(!b)return;const m=new Set;while(m.size<3)m.add(ri(25));GM={t:"m",b,m,o:new Set,over:0};GS.msg="";save();games()}
 function gMopen(i){if(!GM||GM.over||GM.o.has(i))return;if(GM.m.has(i)){GM.over=1;GS.msg="Мина! −"+f(GM.b);save()}else{GM.o.add(i);if(GM.o.size==22){gMcash();return}}games()}
 function gMcash(){if(!GM||GM.over||!GM.o.size)return;const k=GM.o.size,w=Math.floor(GM.b*gMul(k));GM.over=1;gPay(w,"Забрали "+f(w)+" (×"+gMul(k).toFixed(2)+")")}
-/* ===== ДУРАК AI (исправлен) ===== */
-let DK=null;
-const DKSU=["♠","♥","♦","♣"];
-const dkBeats=(a,b,tr)=>a.s==b.s?a.r>b.r:(a.s==tr&&b.s!=tr);
-const dkSort=(h,tr)=>h.slice().sort((a,b)=>(a.s==tr?1:0)-(b.s==tr?1:0)||a.s-b.s||a.r-b.r);
-function dkStart(){
- const b=gTake();if(!b)return;
- const deck=[];for(let s=0;s<4;s++)for(let r=6;r<=14;r++)deck.push({r,s});
- for(let i=deck.length-1;i>0;i--){const j=ri(i+1);[deck[i],deck[j]]=[deck[j],deck[i]]}
- const tc=deck[deck.length-1];
- DK={deck,trump:tc.s,trumpCard:tc,p:[],a:[],table:[],attacker:R()<.5?"p":"a",phase:"",over:0,bet:b,msg:"",win:0};
- for(let i=0;i<6;i++){DK.p.push(DK.deck.pop());DK.a.push(DK.deck.pop())}
- save();dkBegin();
-}
-function dkDobor(){for(const k of ["p","a"]){while(DK[k].length<6&&DK.deck.length)DK[k].push(DK.deck.pop())}}
-function dkBegin(){
- DK.table=[];
- if(dkCheckEnd()){games();return}
- if(DK.attacker==="p"){DK.phase="pattack";DK.msg="Вы атакуете"}
- else{
-  DK.phase="pdefend";
-  if(!dkAiAttack()){DK.attacker="p";DK.phase="pattack";DK.msg="ИИ не может атаковать"}
-  else DK.msg="ИИ атакует — отбивайтесь";
- }
- games();
-}
-function dkAiAttack(){
- const h=dkSort(DK.a,DK.trump);
- if(!h.length)return false;
- const c=h.find(x=>x.s!==DK.trump)||h[0];
- DK.a.splice(DK.a.indexOf(c),1);
- DK.table.push({a:c,d:null});
- return true;
-}
-function dkAiDefend(){
- const e=DK.table.find(x=>!x.d);
- if(!e)return false;
- const h=dkSort(DK.a,DK.trump);
- const beat=h.find(x=>dkBeats(x,e.a,DK.trump));
- if(beat){DK.a.splice(DK.a.indexOf(beat),1);e.d=beat;DK.msg="ИИ отбился";return true}
- dkEndBout("a");return false;
-}
-function dkAiMore(){
- if(DK.over)return;
- const ranks=[...new Set(DK.table.map(e=>e.a.r))];
- if(DK.table.length<6&&R()<.6){
-  const h=dkSort(DK.a,DK.trump);
-  const c=h.find(x=>ranks.includes(x.r)&&x.s!==DK.trump);
-  if(c){DK.a.splice(DK.a.indexOf(c),1);DK.table.push({a:c,d:null});DK.phase="pdefend";DK.msg="ИИ подкинул — отбивайтесь";games();return}
- }
- dkEndBout(null);
-}
-function dkEndBout(taker){
- if(!DK||DK.over)return;
- if(taker){
-  const cards=[];DK.table.forEach(e=>{cards.push(e.a);if(e.d)cards.push(e.d)});
-  DK[taker].push(...cards);
-  DK.msg=taker==="p"?"Вы забрали":"ИИ забрал";
- } else DK.msg="Бито";
- DK.table=[];
- dkDobor();
- if(!taker)DK.attacker=DK.attacker==="p"?"a":"p";
- if(dkCheckEnd()){games();return}
- dkBegin();
-}
-function dkCheckEnd(){
- if(DK.deck.length)return false;
- if(DK.p.length&&DK.a.length)return false;
- DK.over=1;
- let w=0,m;
- if(!DK.a.length&&DK.p.length){w=DK.bet*2;m="Вы выиграли! ИИ — дурак"}
- else if(!DK.p.length&&DK.a.length){w=0;m="Вы дурак! Проигрыш"}
- else{w=DK.bet;m="Ничья"}
- S.bal+=w;save();
- DK.msg=m;DK.win=w;
- return true;
-}
-function dkPclick(i){
- if(!DK||DK.over)return;
- const c=DK.p[i];if(!c)return;
- if(DK.phase==="pattack"){
-  if(DK.attacker!=="p")return;
-  if(DK.table.length>=6)return toast("Максимум 6 карт");
-  if(DK.table.length&&!DK.table.some(e=>e.a.r===c.r))return toast("Нужна карта того же ранга");
-  DK.p.splice(i,1);DK.table.push({a:c,d:null});DK.msg="Вы подкинули";
-  dkAiDefend();games();
- } else if(DK.phase==="pdefend"){
-  const e=DK.table.find(x=>!x.d);
-  if(!e)return toast("Некуда бить");
-  if(!dkBeats(c,e.a,DK.trump))return toast("Не бьёт");
-  DK.p.splice(i,1);e.d=c;DK.msg="Отбито";
-  dkAiMore();
- }
-}
-function dkPlayerBit(){
- if(!DK||DK.over||DK.phase!=="pattack"||DK.attacker!=="p")return;
- if(DK.table.some(e=>!e.d))return toast("Сначала отбейте");
- dkEndBout(null);
-}
-function dkPlayerTake(){
- if(!DK||DK.over||DK.phase!=="pdefend")return;
- dkEndBout("p");
-}
-/* ===== PVP DURAK ===== */
-let MYGAME=null,MYGAMEDATA=null,MYSTATE=null,MYIDX=-1,pvpUnsub=null,pvpCredited=false,pvpView="menu",pvpGames=[],pvpMyBet=100;
-const PVP_SU=["♠","♥","♦","♣"],PVP_RN=["6","7","8","9","10","J","Q","K","A"];
-function pvpNewDeck(){const d=[];for(let s=0;s<4;s++)for(let r=6;r<=14;r++)d.push({r,s});for(let i=d.length-1;i>0;i--){const j=ri(i+1);[d[i],d[j]]=[d[j],d[i]]}return d}
-function pvpInitState(){const deck=pvpNewDeck(),trump=deck[deck.length-1].s,hands=[[],[]];for(let i=0;i<6;i++){hands[0].push(deck.pop());hands[1].push(deck.pop())}return{deck,trump,hands,table:[],attacker:0,phase:"attack",over:0,msg:""}}
-function pvpBeats(a,b,tr){return a.s===b.s?a.r>b.r:(a.s===tr&&b.s!==tr)}
-function pvpApply(s,myIdx,action){
- const ns=JSON.parse(JSON.stringify(s)),myHand=ns.hands[myIdx];
- if(action.type==="attack"){
-  if(ns.phase!=="attack"||ns.attacker!==myIdx)throw new Error("Не ваш ход атаки");
-  if(ns.table.length>=6)throw new Error("Стол полон");
-  if(action.idx<0||action.idx>=myHand.length)throw new Error("Нет карты");
-  const card=myHand[action.idx];
-  if(ns.table.length){const rk=new Set(ns.table.map(e=>e.a.r));if(!rk.has(card.r))throw new Error("Нужен тот же ранг")}
-  myHand.splice(action.idx,1);ns.table.push({a:card,d:null});ns.phase="defend";ns.msg="";
-  return ns;
- }
- if(action.type==="defend"){
-  if(ns.phase!=="defend"||ns.attacker===myIdx)throw new Error("Не ваша защита");
-  if(action.idx<0||action.idx>=myHand.length)throw new Error("Нет карты");
-  const card=myHand[action.idx],und=ns.table.find(e=>!e.d);
-  if(!und)throw new Error("Некуда бить");
-  if(!pvpBeats(card,und.a,ns.trump))throw new Error("Не бьёт");
-  myHand.splice(action.idx,1);und.d=card;ns.phase="attack";ns.msg="";
-  return ns;
- }
- if(action.type==="bito"){
-  if(ns.phase!=="attack"||ns.attacker!==myIdx)throw new Error("Не ваш ход");
-  if(!ns.table.length)throw new Error("Нет карт");
-  if(ns.table.some(e=>!e.d))throw new Error("Есть неотбитые");
-  pvpEndBout(ns,null);return ns;
- }
- if(action.type==="take"){
-  if(ns.phase!=="defend"||ns.attacker===myIdx)throw new Error("Не ваша защита");
-  pvpEndBout(ns,myIdx);return ns;
- }
- throw new Error("Действие?");
-}
-function pvpEndBout(s,taker){
- if(taker!=null){s.table.forEach(e=>{s.hands[taker].push(e.a);if(e.d)s.hands[taker].push(e.d)})}
- s.table=[];
- for(const i of [0,1]){while(s.hands[i].length<6&&s.deck.length)s.hands[i].push(s.deck.pop())}
- if(taker==null)s.attacker=1-s.attacker;
- if(pvpCheckEnd(s))return;
- s.phase="attack";s.msg=taker==null?"Бито":(taker===0?"Игрок 1 взял":"Игрок 2 взял");
-}
-function pvpCheckEnd(s){
- if(s.deck.length>0)return false;
- if(s.hands[0].length&&s.hands[1].length)return false;
- if(!s.hands[0].length&&!s.hands[1].length)s.over=3;
- else if(!s.hands[0].length)s.over=1;
- else s.over=2;
- s.phase="over";
- return true;
-}
-function pvpCleanup(){if(pvpUnsub){pvpUnsub();pvpUnsub=null}MYGAME=null;MYGAMEDATA=null;MYSTATE=null;MYIDX=-1;pvpCredited=false}
-async function pvpOpenMenu(){
- if(!DB)return toast("Нет соединения");
- if(MYGAME){scr="pvp";render();return}
- scr="pvp";pvpView="menu";render();
- await pvpLoadGames();
- if(scr==="pvp"&&pvpView==="menu")pvpScr();
-}
-async function pvpLoadGames(){
- try{
-  const q=await DB.collection("durakGames").where("status","==","waiting").limit(30).get();
-  pvpGames=[];
-  q.forEach(doc=>{const d=doc.data();if(d.host.uid!==UID)pvpGames.push({id:doc.id,...d})});
- }catch(e){console.warn(e);pvpGames=[]}
-}
-async function pvpCreate(){
- if(!DB)return toast("Нет соединения");
- if(MYGAME)return toast("Вы уже в игре");
- const bet=pvpMyBet;
- if(S.bal<bet)return toast("Нужно "+f(bet));
- S.bal-=bet;save();
- const id=Date.now().toString(36)+Math.random().toString(36).slice(2,8);
- const state=pvpInitState();
- try{
-  await DB.doc("durakGames/"+id).set({
-   host:{uid:UID,nick:NICK,aid:AID},guest:null,bet,status:"waiting",
-   state,turn:0,version:1,createdAt:Date.now(),finishedAt:null,claimed:{}
-  });
-  MYGAME=id;MYIDX=0;pvpView="waiting";pvpCredited=false;
-  pvpSubscribe();pvpScr();
- }catch(e){
-  S.bal+=bet;save();
-  toast("Ошибка: "+(e.message||e.code));
- }
-}
-async function pvpJoin(gid){
- if(!DB)return toast("Нет соединения");
- if(MYGAME)return toast("Вы уже в игре");
- const ref=DB.doc("durakGames/"+gid);
- let bet=0;
- try{
-  const snap=await ref.get();
-  if(!snap.exists)return toast("Игра не найдена");
-  const d=snap.data();
-  if(d.status!=="waiting")return toast("Игра занята");
-  if(d.host.uid===UID)return toast("Это ваша игра");
-  bet=d.bet;
-  if(S.bal<bet)return toast("Нужно "+f(bet));
-  S.bal-=bet;save();
-  await DB.runTransaction(async tx=>{
-   const s2=await tx.get(ref);
-   if(!s2.exists)throw new Error("Игра пропала");
-   if(s2.data().status!=="waiting")throw new Error("Уже занята");
-   tx.update(ref,{guest:{uid:UID,nick:NICK,aid:AID},status:"playing"});
-  });
-  MYGAME=gid;MYIDX=1;pvpView="playing";pvpCredited=false;
-  pvpSubscribe();pvpScr();
- }catch(e){
-  S.bal+=bet;save();
-  toast("Не удалось: "+(e.message||e.code));
- }
-}
-function pvpSubscribe(){
- if(pvpUnsub){pvpUnsub();pvpUnsub=null}
- if(!DB||!MYGAME)return;
- pvpUnsub=DB.doc("durakGames/"+MYGAME).onSnapshot(snap=>{
-  if(!snap.exists){pvpCleanup();if(scr==="pvp"){pvpView="menu";pvpScr()}return}
-  const d=snap.data();
-  MYGAMEDATA=d;MYSTATE=d.state;
-  if(d.host?.uid===UID)MYIDX=0;else if(d.guest?.uid===UID)MYIDX=1;else{pvpCleanup();return}
-  if(d.status==="playing"&&pvpView!=="playing"&&pvpView!=="over")pvpView="playing";
-  if(d.state?.over){pvpView="over";if(!pvpCredited)pvpClaim()}
-  if(scr==="pvp")pvpScr();
- },err=>{console.warn(err);toast("Sync: "+(err.message||err.code))});
-}
-async function pvpAct(action){
- if(!DB||!MYGAME||MYIDX<0)return;
- const ref=DB.doc("durakGames/"+MYGAME);
- try{
-  await DB.runTransaction(async tx=>{
-   const snap=await tx.get(ref);
-   if(!snap.exists)throw new Error("Игра пропала");
-   const d=snap.data();
-   if(d.status!=="playing")throw new Error("Игра не идёт");
-   if(d.turn!==MYIDX)throw new Error("Не ваш ход");
-   const ns=pvpApply(d.state,MYIDX,action);
-   const nt=ns.over?-1:(ns.phase==="attack"?ns.attacker:1-ns.attacker);
-   const upd={state:ns,turn:nt,version:(d.version||0)+1};
-   if(ns.over){upd.status="finished";upd.finishedAt=Date.now()}
-   tx.update(ref,upd);
-  });
- }catch(e){toast(e.message||"Ошибка хода")}
-}
-async function pvpClaim(){
- if(!DB||!MYGAME||MYIDX<0)return;
- const ref=DB.doc("durakGames/"+MYGAME);
- let shouldCredit=false,bet=0,over=0;
- try{
-  await DB.runTransaction(async tx=>{
-   const snap=await tx.get(ref);
-   if(!snap.exists)return;
-   const d=snap.data();
-   over=d.state?.over||0;
-   if(!over)return;
-   const claimed=d.claimed||{};
-   if(claimed[MYIDX])return;
-   bet=d.bet;
-   tx.update(ref,{claimed:{...claimed,[MYIDX]:true}});
-   shouldCredit=true;
-  });
- }catch(e){console.warn("claim",e);return}
- if(!shouldCredit)return;
- pvpCredited=true;
- if(over===1&&MYIDX===0){S.bal+=bet*2;save();toast("Вы выиграли "+f(bet*2))}
- else if(over===2&&MYIDX===1){S.bal+=bet*2;save();toast("Вы выиграли "+f(bet*2))}
- else if(over===3){S.bal+=bet;save();toast("Ничья, ставка возвращена")}
- else toast("Вы проиграли "+f(bet));
-}
-async function pvpLeave(){
- const gid=MYGAME,view=pvpView,idx=MYIDX;
- pvpCleanup();pvpView="menu";pvpScr();
- if(!gid||!DB)return;
- if(view==="waiting"){
-  try{
-   const ref=DB.doc("durakGames/"+gid);
-   const snap=await ref.get();
-   if(snap.exists&&snap.data().status==="waiting"&&snap.data().host.uid===UID){
-    S.bal+=snap.data().bet;save();
-    await ref.delete();
-   }
-  }catch(e){}
- }else if(view==="playing"){
-  try{
-   const ref=DB.doc("durakGames/"+gid);
-   const snap=await ref.get();
-   if(snap.exists&&snap.data().status==="playing"){
-    const winner=1-idx;
-    const ns={...snap.data().state,over:winner===0?1:2,phase:"over",msg:"Соперник вышел"};
-    await ref.update({status:"finished",state:ns,finishedAt:Date.now()});
-   }
-  }catch(e){}
- }
-}
-async function pvpAutoRejoin(){
- if(!DB||!UID||MYGAME)return false;
- try{
-  for(const q of [
-   DB.collection("durakGames").where("host.uid","==",UID).where("status","==","playing").limit(1),
-   DB.collection("durakGames").where("host.uid","==",UID).where("status","==","waiting").limit(1),
-   DB.collection("durakGames").where("guest.uid","==",UID).where("status","==","playing").limit(1)
-  ]){
-   let snap;try{snap=await q.get()}catch(e){continue}
-   if(!snap.empty){
-    const doc=snap.docs[0],d=doc.data();
-    MYGAME=doc.id;MYIDX=d.host.uid===UID?0:1;
-    pvpView=d.status==="playing"?"playing":"waiting";pvpCredited=false;
-    pvpSubscribe();scr="pvp";render();
-    return true;
-   }
-  }
- }catch(e){console.warn("rejoin",e)}
- return false;
-}
-function pvpScr(){
- if(pvpView==="menu")pvpMenuUI();
- else if(pvpView==="waiting")pvpWaitingUI();
- else if(pvpView==="playing"||pvpView==="over")pvpPlayingUI();
-}
-function pvpCardHTML(c,i,onclick){
- const col=(c.s===1||c.s===2)?"#d11":"#111";
- const oc=onclick?`onclick="pvpCardClick(${i})" style="cursor:pointer;`:`style="`;
- return `<span ${oc}display:inline-flex;flex-direction:column;justify-content:space-between;width:54px;height:78px;padding:4px 5px;box-sizing:border-box;border-radius:7px;margin:3px;background:#fff;color:${col};text-shadow:none;border:1px solid #999;font:700 18px/1 Georgia,serif"><span>${PVP_RN[c.r-6]}</span><span style="align-self:center;font-size:26px">${PVP_SU[c.s]}</span><span style="align-self:flex-end;transform:rotate(180deg)">${PVP_RN[c.r-6]}</span></span>`;
-}
-function pvpCardClick(i){
- if(!MYSTATE||MYSTATE.over||!MYGAMEDATA||MYGAMEDATA.status!=="playing")return;
- const s=MYSTATE;
- const myTurn=(s.phase==="attack"&&s.attacker===MYIDX)||(s.phase==="defend"&&s.attacker!==MYIDX);
- if(!myTurn)return toast("Не ваш ход");
- if(s.phase==="attack")pvpAct({type:"attack",idx:i});
- else pvpAct({type:"defend",idx:i});
-}
-function pvpMenuUI(){
- const B=(t,c,x="")=>`<button class="b ${c||""}" onclick="${t}" ${x}>`;
- $("#app").innerHTML=`
-  <div class="p big" style="color:#ffc864">🌐 Дурак PvP</div>
-  <div class="p">Баланс: ${f(S.bal)}</div>
-  <div class="p"><div style="font-size:14px;opacity:.8">Ставка</div>
-   <input id="pvbet" type="number" min="1" value="${pvpMyBet}" oninput="pvpMyBet=Math.max(1,Math.floor(+this.value||1))" style="font-size:22px;font-weight:700;letter-spacing:0"></div>
-  ${B("pvpCreate()","k")}Создать игру (${f(pvpMyBet)})</button>
-  ${B("pvpRefresh()","")}🔄 Обновить список</button>
-  <div class="p" style="font-size:14px">Открытые игры:</div>
-  <div>${pvpGames.length?pvpGames.map(g=>`<div class="pl" style="background:#283c28;align-items:center;gap:6px"><span><b>${esc(g.host.nick)}</b></span><span>${f(g.bet)}</span><button class="b s k" onclick="pvpJoin('${g.id}')">Войти</button></div>`).join(""):'<div class="p">Нет открытых игр</div>'}</div>
-  ${B("scr='main';pvpCleanup();render()","g")}Назад</button>
- `;
-}
-async function pvpRefresh(){await pvpLoadGames();if(scr==="pvp"&&pvpView==="menu")pvpScr()}
-function pvpWaitingUI(){
- $("#app").innerHTML=`
-  <div class="p big" style="color:#ffc864">🌐 Дурак PvP</div>
-  <div class="p">⏳ Ожидание соперника...</div>
-  <div class="p" style="font-size:13px;word-break:break-all">ID игры: ${MYGAME}</div>
-  <div class="p">Ставка: ${f(pvpMyBet)} (списана)</div>
-  <button class="b r" onclick="pvpLeave()">Отменить и вернуть ставку</button>
- `;
-}
-function pvpPlayingUI(){
- if(!MYSTATE||MYIDX<0||!MYGAMEDATA)return;
- const s=MYSTATE,oppIdx=1-MYIDX,oppNick=oppIdx===0?(MYGAMEDATA.host?.nick||"?"):(MYGAMEDATA.guest?.nick||"?");
- const B=(t,c,x="")=>`<button class="b ${c||""}" onclick="${t}" ${x}>`;
- const myHand=s.hands[MYIDX]||[],oppHand=s.hands[oppIdx]||[];
- const myTurn=s.over===0&&((s.phase==="attack"&&s.attacker===MYIDX)||(s.phase==="defend"&&s.attacker!==MYIDX));
- const tableHTML=s.table.map(e=>`<span style="display:inline-block;margin:2px">${pvpCardHTML(e.a)}${e.d?pvpCardHTML(e.d):'<span style="opacity:.5">…</span>'}</span>`).join("");
- const canBito=s.phase==="attack"&&s.attacker===MYIDX&&s.table.length>0&&s.table.every(e=>e.d);
- const canTake=s.phase==="defend"&&s.attacker!==MYIDX;
- let resultHTML="";
- if(s.over){
-  const iWin=(s.over===1&&MYIDX===0)||(s.over===2&&MYIDX===1);
-  resultHTML=`<div class="p big" style="color:${iWin?"#4c4":s.over===3?"#ffc864":"#e55"}">${s.over===3?"🤝 Ничья":iWin?"🏆 Победа!":"💀 Проигрыш"}</div>`;
- }
- let actHTML="";
- if(!s.over){
-  actHTML+=`<div style="display:flex;flex-wrap:wrap;justify-content:center;margin:8px 0">${myHand.map((c,i)=>pvpCardHTML(c,i,true)).join("")}</div>`;
-  if(myTurn){
-   if(canBito)actHTML+=B("pvpAct({type:'bito'})","k")+"Бито</button>";
-   if(canTake)actHTML+=B("pvpAct({type:'take'})","r")+"Взять</button>";
-  } else actHTML+=`<div class="p">Ход соперника...</div>`;
-  actHTML+=B("pvpLeave()","g")+"Сдаться</button>";
- } else actHTML+=B("pvpLeave()","g")+"Выйти</button>";
- $("#app").innerHTML=`
-  <div class="p big" style="color:#ffc864">🌐 Дурак PvP</div>
-  <div class="p" style="font-size:14px">
-   Вы: <b>${esc(NICK)}</b> · Соперник: <b>${esc(oppNick)}</b><br>
-   Козырь: <b>${PVP_SU[s.trump]}</b> · Колода: ${s.deck.length} · Карт у соперника: ${oppHand.length}
-  </div>
-  <div class="p"><div style="font-size:12px;opacity:.7">Стол</div><div>${tableHTML||"—"}</div></div>
-  <div class="p" style="font-size:14px">${s.msg||(myTurn?"Ваш ход":"Ход соперника")}</div>
-  ${resultHTML}${actHTML}
- `;
-}
-/* ===== GAMES MENU ===== */
-function games(){if(S.fm)gFsettle();const gmBusy=!!(GM&&!GM.over),dkBusy=GS.g==="durak"&&!!(DK&&!DK.over),act=gmBusy||(GS.g==="foot"&&!!S.fm)||dkBusy,g=GS.g,B=(t,c,x="")=>`<button class="b ${c||""}" onclick="${t}" ${x}>`;let h="";
- if(g==="menu")h=`${B("gGo('coin')")}🪙 Орёл и решка</button>${B("gGo('rou')")}🎡 Рулетка</button>${B("gGo('bj')")}🃏 Блэкджек</button>${B("gGo('mines')")}💣 Мины</button>${B("gGo('foot')")}⚽ Футбол</button>${B("gGo('durak')")}🃏 Дурак (ИИ)</button>${B("pvpOpenMenu()","",`style="background:#7a3a96"`)}🌐 Дурак PvP</button>`;
- else if(g==="foot"){const fm=S.fm;h=fm?(fm.tk?`<canvas id="fc" width="360" height="240" style="width:100%;border-radius:12px;touch-action:none;background:#1b2a3a" onpointerdown="gCP(event)" onpointermove="gCP(event)"></canvas>`:"")+`<div class="p" id="fml">${gFlive()}</div>`+(fm.tk?(fm.k===1?`<div class="p" style="font-size:14px">На ничью нельзя выбегать</div>`:B("gFplay()","r",fm.n>=3||S.bal<1000||CM?"disabled":"")+`🥅 Пенальти $1000 (${3-fm.n})</button>`):`<div class="p" style="font-size:14px">Ждите результат</div>`):`<div class="p">${B("GS.tick=!GS.tick;games()",GS.tick?"k":"")}🎟 Билет $100: ${GS.tick?"ДА":"НЕТ"}</button><div style="font-size:13px;margin-top:6px">Выигрыш = 20% от ставки + возврат ставки</div></div>`+GF.map((m,i)=>`<div class="p"><div style="font-weight:700">${esc(GT[m.a][0])} — ${esc(GT[m.b][0])}</div><div class="row" style="margin-top:6px">${[0,1,2].map(k=>B("gFbet("+i+","+k+")","",`style="font-size:15px;padding:8px 2px"`)+["П1","Х","П2"][k]+" "+m.o[k].toFixed(2)+"</button>").join("")}</div></div>`).join("")}
- else if(g==="coin"){const dis=act?"disabled":"",ck=coinSkin();h=`<div class="${ck.anim}" id="cn" style="width:110px;height:110px;margin:6px auto;border-radius:50%;background:${ck.bg};border:4px solid #0007;display:flex;align-items:center;justify-content:center;font:800 20px Georgia,serif;color:${ck.tc};text-shadow:none;box-shadow:0 4px 10px #0008">${GS.lc==null?"🪙":GS.lc?"РЕШКА":"ОРЁЛ"}</div><div class="row">${B("gCoin(0)","",dis)}Орёл</button>${B("gCoin(1)","",dis)}Решка</button></div><div class="p" style="font-size:14px">×1.95</div>`}
- else if(g==="rou"){const dis=act?"disabled":"";h=`<div id="rw" class="p big" style="font-size:48px;background:${gRc(GS.last)}">${GS.last==null?"🎡":GS.last}</div><div class="row">${B("gRou('r')","r",dis)}Красное ×2</button>${B("gRou('b')","g",dis)}Чёрное ×2</button></div><div class="row">${B("gRou('e')","",dis)}Чёт ×2</button>${B("gRou('o')","",dis)}Нечёт ×2</button></div><div class="p"><div style="font-size:14px;margin-bottom:6px">×36:</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${Array.from({length:37},(_,i)=>B("gRou('n',"+i+")","",`style="padding:8px 0;font-size:14px;background:${gRc(i)}" ${dis}`)+i+"</button>").join("")}</div></div>`}
- else if(g==="bj"){h=GM?`<div class="p"><div style="font-size:14px">Дилер${GM.over?" ("+ghv(GM.d)+")":""}</div>${GM.d.map((c,i)=>gCard(c,!GM.over&&i===1)).join("")}<div style="font-size:14px;margin-top:6px">Вы (${ghv(GM.p)})</div>${GM.p.map(c=>gCard(c)).join("")}</div>`:"";
+function games(){if(S.fm)gFsettle();const gmBusy=!!(GM&&!GM.over),act=gmBusy||(GS.g=="foot"&&!!S.fm),g=GS.g,B=(t,c,x="")=>`<button class="b ${c||""}" onclick="${t}" ${x}>`;let h="";
+ if(g=="menu")h=`${B("gGo('coin')")}🪙 Орёл и решка</button>${B("gGo('rou')")}🎡 Рулетка</button>${B("gGo('bj')")}🃏 Блэкджек</button>${B("gGo('mines')")}💣 Мины</button>${B("gGo('foot')")}⚽ Футбол</button>`;
+ else if(g=="foot"){const fm=S.fm;h=fm?(fm.tk?`<canvas id="fc" width="360" height="240" style="width:100%;border-radius:12px;touch-action:none;background:#1b2a3a" onpointerdown="gCP(event)" onpointermove="gCP(event)"></canvas>`:"")+`<div class="p" id="fml">${gFlive()}</div>`+(fm.tk?(fm.k===1?`<div class="p" style="font-size:14px">На ничью нельзя выбегать</div>`:B("gFplay()","r",fm.n>=3||S.bal<1000||CM?"disabled":"")+`🥅 Пенальти $1000 (${3-fm.n})</button>`):`<div class="p" style="font-size:14px">Ждите результат</div>`):`<div class="p">${B("GS.tick=!GS.tick;games()",GS.tick?"k":"")}🎟 Билет $100: ${GS.tick?"ДА":"НЕТ"}</button><div style="font-size:13px;margin-top:6px">Выигрыш = 20% от ставки + возврат ставки</div></div>`+GF.map((m,i)=>`<div class="p"><div style="font-weight:700">${esc(GT[m.a][0])} — ${esc(GT[m.b][0])}</div><div class="row" style="margin-top:6px">${[0,1,2].map(k=>B("gFbet("+i+","+k+")","",`style="font-size:15px;padding:8px 2px"`)+["П1","Х","П2"][k]+" "+m.o[k].toFixed(2)+"</button>").join("")}</div></div>`).join("")}
+ else if(g=="coin"){const dis=act?"disabled":"",ck=coinSkin();h=`<div class="${ck.anim}" id="cn" style="width:110px;height:110px;margin:6px auto;border-radius:50%;background:${ck.bg};border:4px solid #0007;display:flex;align-items:center;justify-content:center;font:800 20px Georgia,serif;color:${ck.tc};text-shadow:none;box-shadow:0 4px 10px #0008">${GS.lc==null?"🪙":GS.lc?"РЕШКА":"ОРЁЛ"}</div><div class="row">${B("gCoin(0)","",dis)}Орёл</button>${B("gCoin(1)","",dis)}Решка</button></div><div class="p" style="font-size:14px">×1.95</div>`}
+ else if(g=="rou"){const dis=act?"disabled":"";h=`<div id="rw" class="p big" style="font-size:48px;background:${gRc(GS.last)}">${GS.last==null?"🎡":GS.last}</div><div class="row">${B("gRou('r')","r",dis)}Красное ×2</button>${B("gRou('b')","g",dis)}Чёрное ×2</button></div><div class="row">${B("gRou('e')","",dis)}Чёт ×2</button>${B("gRou('o')","",dis)}Нечёт ×2</button></div><div class="p"><div style="font-size:14px;margin-bottom:6px">×36:</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${Array.from({length:37},(_,i)=>B("gRou('n',"+i+")","",`style="padding:8px 0;font-size:14px;background:${gRc(i)}" ${dis}`)+i+"</button>").join("")}</div></div>`}
+ else if(g=="bj"){h=GM?`<div class="p"><div style="font-size:14px">Дилер${GM.over?" ("+ghv(GM.d)+")":""}</div>${GM.d.map((c,i)=>gCard(c,!GM.over&&i===1)).join("")}<div style="font-size:14px;margin-top:6px">Вы (${ghv(GM.p)})</div>${GM.p.map(c=>gCard(c)).join("")}</div>`:"";
   h+=act?`<div class="row">${B("gHit()")}Взять</button>${B("gBjEnd()","k")}Хватит</button></div>`:`${B("gBj()","k")}${GM?"Новая":"Раздать"}</button><div class="p" style="font-size:14px">До 17</div>`}
- else if(g==="mines"){const k=GM?GM.o.size:0;h=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:25},(_,i)=>{const o=GM&&GM.o.has(i),mn=GM&&GM.over&&GM.m.has(i);return B("gMopen("+i+")","",`style="padding:14px 0;${o?"background:#2a8a2a":mn?"background:#a22":""}" ${!act||o?"disabled":""}`)+(o?"💎":mn?"💣":"?")+"</button>"}).join("")}</div>`;
+ else if(g=="mines"){const k=GM?GM.o.size:0;h=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:25},(_,i)=>{const o=GM&&GM.o.has(i),mn=GM&&GM.over&&GM.m.has(i);return B("gMopen("+i+")","",`style="padding:14px 0;${o?"background:#2a8a2a":mn?"background:#a22":""}" ${!act||o?"disabled":""}`)+(o?"💎":mn?"💣":"?")+"</button>"}).join("")}</div>`;
   h+=act?`${B("gMcash()","k",k?"":"disabled")}Забрать ${f(Math.floor(GM.b*gMul(k)))} (×${gMul(k).toFixed(2)})</button>`:`${B("gMstart()","k")}${GM?"Снова":"Начать"}</button>`}
- else if(g==="durak"){
-  if(!DK){h='<div class="p">Колода 36 карт. Оставьте ИИ с картами.</div>'+B("dkStart()","k")+"Начать ("+f(GS.bet)+")</div>"}
-  else{
-   h='<div class="p"><div style="font-size:14px">Козырь: <b>'+DKSU[DK.trump]+'</b> · Колода: '+DK.deck.length+' · У ИИ: '+DK.a.length+'</div></div>';
-   h+='<div class="p" style="min-height:84px"><div style="font-size:12px;opacity:.7">Стол</div><div>'+DK.table.map(e=>gCard(e.a)+(e.d?gCard(e.d):'<span style="opacity:.5;margin:0 6px">…</span>')).join(' ')+'</div></div>';
-   h+='<div class="p">'+DK.msg+'</div>';
-   h+='<div style="display:flex;flex-wrap:wrap;justify-content:center">'+DK.p.map((c,i)=>'<span onclick="dkPclick('+i+')" style="cursor:pointer">'+gCard(c)+'</span>').join('')+'</div>';
-   if(!DK.over){
-    if(DK.phase==="pdefend")h+=B("dkPlayerTake()","r")+"Взять</button>";
-    if(DK.phase==="pattack"&&DK.attacker==="p"&&DK.table.every(e=>e.d))h+=B("dkPlayerBit()","k")+"Бито</button>";
-   } else h+=B("DK=null;games()","k")+"Новая</button>";
-  }}
- $("#app").innerHTML=`<div class="p big">Баланс: ${f(S.bal)}</div>${g!=="menu"?`<div class="p"><div style="font-size:14px;opacity:.8">Ставка</div><input id="gbi" type="number" inputmode="numeric" min="1" value="${GS.bet}" ${act?"disabled":""} style="font-size:22px;font-weight:700;letter-spacing:0" oninput="gBet(this.value)" onchange="this.value=GS.bet"><div class="row" style="margin-top:6px">${[2,3,5].map(m=>B("gX("+m+")","s",act?"disabled":"")+"×"+m+"</button>").join("")}${B("gX(0)","s",act?"disabled":"")}Макс</button></div></div>`:""}${GS.msg?`<div class="p big">${GS.msg}</div>`:""}${h}${B(g==="menu"?"scr='main';render()":"gGo('menu')","g",(gmBusy||dkBusy)?"disabled":"")}Назад</button>`}
+ $("#app").innerHTML=`<div class="p big">Баланс: ${f(S.bal)}</div>${g!=="menu"?`<div class="p"><div style="font-size:14px;opacity:.8">Ставка</div><input id="gbi" type="number" inputmode="numeric" min="1" value="${GS.bet}" ${act?"disabled":""} style="font-size:22px;font-weight:700;letter-spacing:0" oninput="gBet(this.value)" onchange="this.value=GS.bet"><div class="row" style="margin-top:6px">${[2,3,5].map(m=>B("gX("+m+")","s",act?"disabled":"")+"×"+m+"</button>").join("")}${B("gX(0)","s",act?"disabled":"")}Макс</button></div></div>`:""}${GS.msg?`<div class="p big">${GS.msg}</div>`:""}${h}${B(g==="menu"?"scr='main';render()":"gGo('menu')","g",gmBusy?"disabled":"")}Назад</button>`}
 const GT=[["Реал Мадрид",95],["Барселона",90],["Ман Сити",93],["Бавария",91],["ПСЖ",86],["Ливерпуль",89],["Арсенал",88],["Интер",85],["Ювентус",80],["Милан",79],["Челси",78],["Атлетико",82],["Боруссия Д",77],["Наполи",78]];
 let GF=[];
 function gFnew(){const ix=[...GT.keys()].sort(()=>R()-.5);GF=[];for(let i=0;i<3;i++){const a=ix[2*i],b=ix[2*i+1],pa=1/(1+Math.pow(10,(GT[b][1]-GT[a][1])/20)),px=.25,p=[(1-px)*pa,px,(1-px)*(1-pa)];GF.push({a,b,p,o:p.map(x=>Math.max(1.05,Math.floor(92/x)/100))})}}
